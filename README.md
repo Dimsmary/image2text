@@ -13,4 +13,4 @@ Pyqt5 and Pillow Required.
 5) Then the binary data will be saved in a list
 6) The list will output in a nice format.
 ## Example
-If the picture looks like this(- means white while + meas black):  
+Sorry there is no example...  
