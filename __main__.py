@@ -21,6 +21,7 @@ class MainCode(QMainWindow, mainwindow.Ui_MainWindow):
                 self.lab_path.setText(FilePath)  # 显示路径
 
     def on_convert(self):
+        self.tip.setText('Converting...')
         pat = self.lab_path.text()      # 获取label显示的内容
         if pat != 'Null':
             try:
@@ -49,24 +50,33 @@ class MainCode(QMainWindow, mainwindow.Ui_MainWindow):
                     for x in range(deal.size[0]):
                         binary = 0      # 初始化输出变量
                         for y in range(deal.size[1]):                  # 上往下 左往右遍历
-                            if deal.getpixel((x, y)) != (255, 255, 255):        # 如果像素点不为白色
-                                binary = (binary << 1) + 1
-                            else:
+                            if deal.getpixel((x, y))[0] > 240 and \
+                                    deal.getpixel((x, y))[1] > 240 and \
+                                    deal.getpixel((x, y))[2] > 240:     # 与白色相近的均视为白色
                                 binary = (binary << 1)
+                            else:
+                                binary = (binary << 1) + 1
+                        output[x] = binary  # 所有结果输入值这个列表
+                    for i in range(output_size):  # 循环输出列表内容 并且格式化
+                        data = str(hex(output[i]))
+                        s_out = s_out + data + ', '
 
                 else:
                     for y in range(deal.size[1]):
                         binary = 0      # 初始化输出变量
                         for x in range(deal.size[0]):                  # 右往左 上往下遍历
-                            if deal.getpixel((x, y)) != (255, 255, 255):        # 如果像素点不为白色
-                                binary = (binary << 1) + 1
-                            else:
+                            if deal.getpixel((x, y))[0] > 240 and \
+                                    deal.getpixel((x, y))[1] > 240 and \
+                                    deal.getpixel((x, y))[2] > 240:      # 与白色相近的均视为白色
                                 binary = (binary << 1)
+                            else:
+                                binary = (binary << 1) + 1
                         output[y] = binary  # 所有结果输入值这个列表
                     for i in range(output_size):  # 循环输出列表内容 并且格式化
                         data = str(hex(output[i]))
                         s_out = s_out + data + ', '
                 self.tex_out.setText(s_out)
+                self.tip.setText('Done')
         else:
             QMessageBox.critical(self, 'Error', 'Path is not selected!')
 
