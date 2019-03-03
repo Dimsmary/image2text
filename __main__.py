@@ -1,6 +1,7 @@
 from PIL import Image
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, QMessageBox
-import sys, os
+import sys
+import os
 import mainwindow
 
 
