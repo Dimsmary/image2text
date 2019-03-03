@@ -14,15 +14,13 @@ class MainCode(QMainWindow, mainwindow.Ui_MainWindow):
         self.btn_convert.clicked.connect(self.on_convert)   # 链接按钮
 
     def on_open(self):
-
             FilePath, _ = QFileDialog.getOpenFileName(self, 'Open', r'./')      # 调用文件选择框 并忽略类型赋值
             if FilePath == '':
-                print('')                       # 取消
+                pass
             else:
                 self.lab_path.setText(FilePath)  # 显示路径
 
     def on_convert(self):
-
         pat = self.lab_path.text()      # 获取label显示的内容
         if pat != 'Null':
             try:
@@ -35,30 +33,40 @@ class MainCode(QMainWindow, mainwindow.Ui_MainWindow):
 
             else:
                 name, types = os.path.splitext(pat)
-                if img.size[0] == 8 and img.size[1] == 8:
-                    if types != '.bmp':
-                        img.save(name + '.bmp')  # 将图片转码为位图
-                    deal = Image.open(name + '.bmp')
-                    output = [trans for trans in range(8)]      # 创建一个列表
+
+                if types != '.bmp':
+                    img.save(name + '.bmp')  # 将图片转码为位图
+                deal = Image.open(name + '.bmp')
+                # 判断取模方式后创建列表
+                if self.xs.isChecked():
+                    output_size = deal.size[0]
+                else:
+                    output_size = deal.size[1]
+                output = [trans for trans in range(output_size)]  # 创建一个列表
+                s_out = ''  # 初始化最终输出的字符串
+
+                if self.xs.isChecked():                 # 判定取模方式
+                    for x in range(deal.size[0]):
+                        binary = 0      # 初始化输出变量
+                        for y in range(deal.size[1]):                  # 上往下 左往右遍历
+                            if deal.getpixel((x, y)) != (255, 255, 255):        # 如果像素点不为白色
+                                binary = (binary << 1) + 1
+                            else:
+                                binary = (binary << 1)
+
+                else:
                     for y in range(deal.size[1]):
                         binary = 0      # 初始化输出变量
-                        for x in range(deal.size[0]):                  # 从右往左 从上至下遍历像素点
+                        for x in range(deal.size[0]):                  # 右往左 上往下遍历
                             if deal.getpixel((x, y)) != (255, 255, 255):        # 如果像素点不为白色
                                 binary = (binary << 1) + 1
                             else:
                                 binary = (binary << 1)
                         output[y] = binary  # 所有结果输入值这个列表
-                        s_out = ''          # 初始化最终输出的字符串
-                        for i in range(8):  # 循环输出列表内容 并且格式化
-                            data = str(hex(output[i]))
-                            if len(data) == 3:              # 如果格式不对
-                                list_data = list(data)      # 创建一个列表
-                                list_data.insert(2, '0')    # 在列表中插入一个0
-                                data = ''.join(list_data)   # 无空隙链将列表接成字符串
-                            s_out = s_out + data + ', '
-                        self.tex_out.setText(s_out)
-                else:
-                    QMessageBox.critical(self, 'Error', 'Not a standard file!')
+                    for i in range(output_size):  # 循环输出列表内容 并且格式化
+                        data = str(hex(output[i]))
+                        s_out = s_out + data + ', '
+                self.tex_out.setText(s_out)
         else:
             QMessageBox.critical(self, 'Error', 'Path is not selected!')
 
